@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="MachinePark/MachinePark.Client/MachinePark.Client.csproj" />
   <Project Path="MachinePark/MachinePark/MachinePark.csproj" />
 </Solution>

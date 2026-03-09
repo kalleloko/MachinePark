@@ -1,0 +1,50 @@
+
+<div class="card">
+    <div class="card-header">
+        Machines
+    </div>
+
+    <div class="card-body">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach(var machine in Machines) {
+                    <tr>
+                        <td>@machine.Name</td>
+                        <td>@(machine.IsOnline ? "Running" : "Offline")</td>
+                        <td>
+                            <button class="btn btn-sm @ButtonClass(machine)">
+                                @ButtonText(machine)
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<Machine> Machines { get; set; } = [];
+
+    private string ButtonText(Machine machine)
+    {
+        return machine.IsOnline ? "Stop" : "Start";
+    }
+
+    private string ButtonClass(Machine machine)
+    {
+        return machine.IsOnline ? "btn-danger" : "btn-success";
+    }
+}
