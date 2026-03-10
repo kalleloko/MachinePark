@@ -1,14 +1,22 @@
-﻿namespace MachinePark.Client.State;
+﻿using MachinePark.Shared.Models;
+
+namespace MachinePark.State;
 
 public class MachineState
 {
-    public int Count { get; private set; }
+    public int CountTotal { get; private set; }
+    public int CountOnline { get; private set; }
+    public int CountOffline { get; private set; }
 
-    public event Action? Onchange;
+    public event Action? OnChange;
 
-    public void SetCount(int count)
+    public void SetCount(IReadOnlyList<Machine> machines)
     {
-        Count = count;
-        Onchange?.Invoke();
+        CountTotal = machines.Count;
+        CountOnline = machines.Count(m => m.IsOnline);
+        CountOffline = CountTotal - CountOnline;
+        NotifyStateChanged();
     }
+
+    public void NotifyStateChanged() => OnChange?.Invoke();
 }

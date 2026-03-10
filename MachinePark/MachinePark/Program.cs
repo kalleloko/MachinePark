@@ -1,5 +1,8 @@
-using MachinePark.Client.State;
+using MachinePark.Client.Services;
 using MachinePark.Components;
+using MachinePark.Data;
+using MachinePark.Shared.Models;
+using MachinePark.State;
 
 namespace MachinePark;
 
@@ -13,7 +16,12 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveWebAssemblyComponents();
 
+        builder.Services.AddSingleton<MachineRepository>();
         builder.Services.AddSingleton<MachineState>();
+        builder.Services.AddHttpClient<MachineApi>(client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:7043");
+        });
 
 
         var app = builder.Build();
@@ -39,6 +47,38 @@ public class Program
         app.MapRazorComponents<App>()
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
+
+
+
+
+        app.MapGet("/api/machines", (MachineRepository repo) =>
+        {
+            return repo.GetMachines();
+        });
+
+        app.MapPost("/api/machines", (Machine machine, MachineRepository repo) =>
+        {
+            repo.AddMachine(machine);
+            return Results.Ok();
+        });
+
+        app.MapPost("/api/machines/{id:guid}/start", (Guid id, MachineRepository repo) =>
+        {
+            repo.StartMachine(id);
+            return Results.Ok();
+        });
+
+        app.MapPost("/api/machines/{id:guid}/stop", (Guid id, MachineRepository repo) =>
+        {
+            repo.StopMachine(id);
+            return Results.Ok();
+        });
+
+        app.MapDelete("/api/machines/{id:guid}", (Guid id, MachineRepository repo) =>
+        {
+            repo.RemoveMachine(id);
+            return Results.Ok();
+        });
 
         app.Run();
     }

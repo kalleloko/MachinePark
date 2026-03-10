@@ -3,5 +3,6 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="MachinePark/MachinePark.Client/MachinePark.Client.csproj" />
+  <Project Path="MachinePark/MachinePark.Shared/MachinePark.Shared.csproj" />
   <Project Path="MachinePark/MachinePark/MachinePark.csproj" />
 </Solution>

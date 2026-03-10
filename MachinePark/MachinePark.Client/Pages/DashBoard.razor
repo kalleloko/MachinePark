@@ -1,15 +1,18 @@
 ﻿@page "/"
+@* @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false)) *@
 @using MachinePark.Client.Components
+@using MachinePark.Client.Services
+@using MachinePark.State
 
 <PageTitle>MachinePark Dashboard</PageTitle>
 
 <h1>Dashboard</h1>
-<p>Overview of your industrial IoT devices.</p>
+<h6 class="text-muted">Overview of your industrial IoT devices.</h6>
 
 <div class="container mt-4">
 
     <div class="row">
-
+        <p>@Test</p>
         <!-- Left card (4 columns) -->
         <div class="col-md-4">
             <div class="card">
@@ -18,35 +21,49 @@
                 </div>
 
                 <div class="card-body">
-                    Running machines: 3<br />
-                    Stopped machines: 2
+                    Total: @State.CountTotal<br />
+                    Running machines: @State.CountOnline<br />
+                    Stopped machines: @State.CountOffline
                 </div>
             </div>
         </div>
 
         <!-- Right card (8 columns) -->
         <div class="col-md-8">
-            <MachineTableCard Machines="_machines"/>
+            <MachineTableCard Machines="_machines" OnToggleOnlineState="ToggleOnlineState" />
         </div>
     </div>
 
 </div>
 @code {
+
     [Inject]
-    public MachineState State { get; set; } = null!;
+    private MachineApi Api { get; set; } = null!;
+
+    [Inject]
+    private MachineState State { get; set; } = null!;
 
     private List<Machine> _machines = [];
 
-    protected override void OnInitialized()
-    {
-        _machines = [
-            new Machine { Name = "Machine A", LastData = "Running", IsOnline = true },
-            new Machine { Name = "Machine B", LastData = "Stopped", IsOnline = false  },
-            new Machine { Name = "Machine C", LastData = "Stopped", IsOnline = false  }
-            ];
+    private string Test { get; set; } = "init";
 
-        UpdateCount();
+    protected async override Task OnInitializedAsync()
+    {
+        await FetchMachines();
     }
 
-    private void UpdateCount() => State.SetCount(_machines.Count);
+    private async Task ToggleOnlineState(Machine machine)
+    {
+        await (machine.IsOnline ? Api.StopMachineAsync(machine.Id) : Api.StartMachineAsync(machine.Id));
+        await FetchMachines();
+        Test = $"update {machine.Name}";
+    }
+
+    private void UpdateCount() => State.SetCount(_machines);
+
+    private async Task FetchMachines()
+    {
+        _machines = await Api.GetMachinesAsync();
+        UpdateCount();
+    }
 }
