@@ -1,7 +1,32 @@
+@inject IJSRuntime JS
+
+<div class="modal fade" id="addMachineModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add machine</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input class="form-control" @bind="machineName" placeholder="Machine name" />
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" @onclick="Save">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 <div class="card shadow-sm">
-    <div class="card-header">
-        Machines
+    <div class="card-header d-flex">
+        <span>Machines</span>
+        <button class="btn btn-sm btn-primary ms-auto" @onclick="OpenModal">Add machine</button>
     </div>
 
     <div class="card-body">
@@ -48,6 +73,8 @@
     [Parameter]
     public EventCallback<Machine> OnToggleOnlineState { get; set; }
 
+    private string machineName { get; set; } = string.Empty;
+
     private string ButtonText(Machine machine)
     {
         return machine.IsOnline ? "Stop" : "Start";
@@ -63,5 +90,16 @@
         if (OnToggleOnlineState.HasDelegate)
             await OnToggleOnlineState.InvokeAsync(machine);
 
+    }
+    private async Task OpenModal(MouseEventArgs args)
+    {
+        await JS.InvokeVoidAsync("showModal", "addMachineModal");
+    }
+
+    private async Task Save()
+    {
+        // spara maskin
+
+        await JS.InvokeVoidAsync("hideModal", "addMachineModal");
     }
 }
