@@ -15,17 +15,7 @@
         <p>@Test</p>
         <!-- Left card (4 columns) -->
         <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    Statistics
-                </div>
-
-                <div class="card-body">
-                    Total: @State.CountTotal<br />
-                    Running machines: @State.CountOnline<br />
-                    Stopped machines: @State.CountOffline
-                </div>
-            </div>
+            <StatisticsCard />
         </div>
 
         <!-- Right card (8 columns) -->

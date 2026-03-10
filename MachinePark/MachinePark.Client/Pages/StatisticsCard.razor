@@ -1,0 +1,17 @@
+@using MachinePark.State
+
+<div class="card">
+    <div class="card-header">
+        Statistics
+    </div>
+
+    <div class="card-body">
+        Total: @State.CountTotal<br />
+        Running machines: @State.CountOnline<br />
+        Stopped machines: @State.CountOffline
+    </div>
+</div>
+@code {
+    [Inject]
+    private MachineState State { get; set; } = null!;
+}
