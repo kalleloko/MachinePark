@@ -1,5 +1,5 @@
 
-<div class="card">
+<div class="card shadow-sm">
     <div class="card-header">
         Machines
     </div>
@@ -55,7 +55,7 @@
 
     private string ButtonClass(Machine machine)
     {
-        return machine.IsOnline ? "btn-danger" : "btn-success";
+        return machine.IsOnline ? "btn-outline-danger" : "btn-outline-success";
     }
 
     private async Task Toggle(Machine machine)

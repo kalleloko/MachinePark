@@ -1,6 +1,6 @@
 @using MachinePark.State
 
-<div class="card">
+<div class="card shadow-sm">
     <div class="card-header">
         Statistics
     </div>
@@ -14,4 +14,18 @@
 @code {
     [Inject]
     private MachineState State { get; set; } = null!;
+    protected override void OnInitialized()
+    {
+        State.OnChange += HandleStateChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= HandleStateChanged;
+    }
 }

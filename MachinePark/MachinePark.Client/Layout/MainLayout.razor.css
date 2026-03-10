@@ -1,11 +1,9 @@
-.page {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
+
 
 main {
     flex: 1;
+    background: #D0E5E3;
+    background: linear-gradient(168deg, rgba(208, 229, 227, 1) 0%, rgba(150, 212, 197, 1) 100%);
 }
 
 .sidebar {
@@ -97,3 +95,6 @@ main {
         top: 0.5rem;
     }
 
+footer {
+    background: #9acab7;
+}
