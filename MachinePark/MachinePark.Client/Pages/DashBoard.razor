@@ -20,7 +20,7 @@
 
         <!-- Right card (8 columns) -->
         <div class="col-md-8">
-            <MachineTableCard Machines="_machines" OnToggleOnlineState="ToggleOnlineState" />
+            <MachineTableCard Machines="_machines" OnToggleOnlineState="ToggleOnlineState" OnAddMachine="HandleAddMachine" OnDeleteMachine="HandleDeleteMachine"/>
         </div>
     </div>
 
@@ -49,11 +49,31 @@
         Test = $"update {machine.Name}";
     }
 
-    private void UpdateCount() => State.SetCount(_machines);
+    private async Task HandleAddMachine(AddMachine machine)
+    {
+        Machine newMachine = new() {
+                Name = machine.Name,
+                IsOnline = machine.IsOnline,
+                LastUpdated = DateTime.Now,
+                LastData = machine.IsOnline ? "Machine created and running" : "Machine created"
+            };
+        await Api.AddMachineAsync(newMachine);
+        await FetchMachines();
+        Test = $"added {newMachine.Name}";
+    }
+
+    private async Task HandleDeleteMachine(Machine machine)
+    {
+        await Api.RemoveMachineAsync(machine.Id);
+        await FetchMachines();
+        Test = $"deleted {machine.Name}";
+    }
 
     private async Task FetchMachines()
     {
         _machines = await Api.GetMachinesAsync();
         UpdateCount();
     }
+
+    private void UpdateCount() => State.SetCount(_machines);
 }

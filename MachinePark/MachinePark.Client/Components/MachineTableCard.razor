@@ -1,32 +1,12 @@
 @inject IJSRuntime JS
 
-<div class="modal fade" id="addMachineModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Add machine</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <input class="form-control" @bind="machineName" placeholder="Machine name" />
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary" @onclick="Save">Save</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
+<AddMachineForm OnAddMachine="HandleAddMachine" />
+<DeleteMachineForm OnDeleteMachine="HandleDeleteMachine" Machine="SelectedMachine"/>
 
 <div class="card shadow-sm">
     <div class="card-header d-flex">
         <span>Machines</span>
-        <button class="btn btn-sm btn-primary ms-auto" @onclick="OpenModal">Add machine</button>
+        <button class="btn btn-sm btn-primary ms-auto" @onclick="OpenAddMachineModal">Add machine</button>
     </div>
 
     <div class="card-body">
@@ -34,9 +14,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th></th>
+                    <th style="width: 55%">Name</th>
+                    <th style="width: 35%">Status</th>
+                    <th style="width: 25px"></th>
+                    <th style="width: 25px"></th>
                 </tr>
             </thead>
 
@@ -45,6 +26,9 @@
                     <tr>
                         <td>
                             @machine.Name
+                            <div>
+                                <small class="text-muted text-sm">@machine.LastData</small>
+                            </div>
                         </td>
                         <td>
                             @(machine.IsOnline ? "Running" : "Offline")
@@ -53,8 +37,13 @@
                             </div>
                         </td>
                         <td>
-                            <button class="btn btn-sm @ButtonClass(machine)" @onclick="@(() => Toggle(machine))">
-                                @ButtonText(machine)
+                            <button class="btn btn-sm @ToggleButtonClass(machine)" title="@ToggleButtonText(machine)" @onclick="@(() => Toggle(machine))">
+                                <i class="bi bi-@ToggleButtonIcon(machine)"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete machine" @onclick="() => OpenDeleteMachineModal(machine)">
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                         </td>
                     </tr>
@@ -73,33 +62,60 @@
     [Parameter]
     public EventCallback<Machine> OnToggleOnlineState { get; set; }
 
-    private string machineName { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback<AddMachine> OnAddMachine { get; set; }
 
-    private string ButtonText(Machine machine)
+    [Parameter]
+    public EventCallback<Machine> OnDeleteMachine { get; set; }
+
+    private Machine? SelectedMachine;
+
+
+    private string ToggleButtonText(Machine machine)
     {
-        return machine.IsOnline ? "Stop" : "Start";
+        return machine.IsOnline ? "Stop machine" : "Start machine";
     }
 
-    private string ButtonClass(Machine machine)
+    private string ToggleButtonIcon(Machine machine)
+    {
+        return machine.IsOnline ? "slash-circle-fill" : "play-fill";
+    }
+
+    private string ToggleButtonClass(Machine machine)
     {
         return machine.IsOnline ? "btn-outline-danger" : "btn-outline-success";
     }
 
     private async Task Toggle(Machine machine)
     {
-        if (OnToggleOnlineState.HasDelegate)
+        if (OnToggleOnlineState.HasDelegate) {
             await OnToggleOnlineState.InvokeAsync(machine);
+        }
 
     }
-    private async Task OpenModal(MouseEventArgs args)
+    private async Task OpenAddMachineModal(MouseEventArgs args)
     {
         await JS.InvokeVoidAsync("showModal", "addMachineModal");
     }
 
-    private async Task Save()
+    private async Task OpenDeleteMachineModal(Machine machine)
     {
-        // spara maskin
+        SelectedMachine = machine;
+        await JS.InvokeVoidAsync("showModal", "deleteMachineModal");
+    }
 
-        await JS.InvokeVoidAsync("hideModal", "addMachineModal");
+    private async Task HandleAddMachine(AddMachine addMachineModel)
+    {
+        if (OnAddMachine.HasDelegate) {
+            await OnAddMachine.InvokeAsync(addMachineModel);
+        }
+    }
+
+    private async Task HandleDeleteMachine(Machine machine)
+    {
+        SelectedMachine = null;
+        if (OnDeleteMachine.HasDelegate) {
+            await OnDeleteMachine.InvokeAsync(machine);
+        }
     }
 }

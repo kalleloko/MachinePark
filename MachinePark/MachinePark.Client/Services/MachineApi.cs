@@ -20,4 +20,7 @@ public class MachineApi(HttpClient http)
 
     public Task AddMachineAsync(Machine machine)
         => http.PostAsJsonAsync("/api/machines", machine);
+
+    public Task UpdateMachineDataAsync(Machine machine)
+        => http.PatchAsync("/api/machines/{machine.Id}/data", JsonContent.Create(machine.LastData));
 }

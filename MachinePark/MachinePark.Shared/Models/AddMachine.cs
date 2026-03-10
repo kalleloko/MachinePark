@@ -2,7 +2,7 @@
 
 namespace MachinePark.Shared.Models;
 
-public class AddToDoItem
+public class AddMachine
 {
     [Required(ErrorMessage = "Please enter a name.")]
     [MinLength(2, ErrorMessage = "Name must be at least 2 characters.")]

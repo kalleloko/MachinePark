@@ -1,0 +1,63 @@
+
+@inject IJSRuntime JS
+
+<div class="modal fade" id="deleteMachineModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <EditForm Model="model" OnValidSubmit="DeleteMachine">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete machine "@Machine?.Name"</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-check mb-3">
+                        <InputCheckbox id="delete-machine-confirmation"
+                                       class="form-check-input"
+                                       @bind-Value="model.IsConfirmed" />
+                        <label for="delete-machine-confirmation" class="form-check-label">Confirm deletion</label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn @SubmitBtnClass">Delete machine</button>
+                </div>
+
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<Machine> OnDeleteMachine { get; set; }
+
+    [Parameter]
+    public Machine? Machine { get; set; }
+
+    private Confirmation model = new();
+
+    private string SubmitBtnClass => model.IsConfirmed ? "btn-danger" : "btn-outline-secondary";
+
+    private async Task DeleteMachine()
+    {
+        if (!model.IsConfirmed)
+        {
+            return;
+        }
+        if (Machine is null)
+        {
+            return;
+        }
+        if(OnDeleteMachine.HasDelegate) {
+            await OnDeleteMachine.InvokeAsync(Machine);
+            model.IsConfirmed = false;
+            Machine = null;
+        }
+        await JS.InvokeVoidAsync("hideModal", "deleteMachineModal");
+    }
+}
