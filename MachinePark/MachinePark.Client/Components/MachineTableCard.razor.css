@@ -1,0 +1,27 @@
+﻿.table-dashboard {
+    font-size: 0.95rem;
+}
+
+.table-dashboard tbody tr:hover td {
+    background-color: rgba(0,0,0,0.03);
+}
+
+.table-dashboard td {
+    vertical-align: middle;
+}
+
+.icon-btn {
+    padding: 0.25rem 0.35rem;
+}
+
+.icon-btn:hover {
+    background-color: rgba(0,0,0,0.06);
+    border-radius: 6px;
+}
+
+.btn-group .btn {
+    border-radius: 0;
+}
+.icon-delete:hover {
+    color: var(--bs-danger);
+}

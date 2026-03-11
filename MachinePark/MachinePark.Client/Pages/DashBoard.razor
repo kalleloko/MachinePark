@@ -12,7 +12,6 @@
 <div class="container mt-4">
 
     <div class="row">
-        <p>@Test</p>
         <!-- Left card (4 columns) -->
         <div class="col-md-4">
             <StatisticsCard />
@@ -20,7 +19,7 @@
 
         <!-- Right card (8 columns) -->
         <div class="col-md-8">
-            <MachineTableCard Machines="_machines" OnToggleOnlineState="ToggleOnlineState" OnAddMachine="HandleAddMachine" OnDeleteMachine="HandleDeleteMachine"/>
+            <MachineTableCard Machines="_machines" OnToggleOnlineState="ToggleOnlineState" OnAddMachine="HandleAddMachine" OnDeleteMachine="HandleDeleteMachine" OnUploadMachineData="HandleUploadData" />
         </div>
     </div>
 
@@ -35,8 +34,6 @@
 
     private List<Machine> _machines = [];
 
-    private string Test { get; set; } = "init";
-
     protected async override Task OnInitializedAsync()
     {
         await FetchMachines();
@@ -46,7 +43,6 @@
     {
         await (machine.IsOnline ? Api.StopMachineAsync(machine.Id) : Api.StartMachineAsync(machine.Id));
         await FetchMachines();
-        Test = $"update {machine.Name}";
     }
 
     private async Task HandleAddMachine(AddMachine machine)
@@ -59,14 +55,18 @@
             };
         await Api.AddMachineAsync(newMachine);
         await FetchMachines();
-        Test = $"added {newMachine.Name}";
     }
 
     private async Task HandleDeleteMachine(Machine machine)
     {
         await Api.RemoveMachineAsync(machine.Id);
         await FetchMachines();
-        Test = $"deleted {machine.Name}";
+    }
+
+    private async Task HandleUploadData(UploadMachineData machineData)
+    {
+        await Api.UpdateMachineDataAsync(machineData);
+        await FetchMachines();
     }
 
     private async Task FetchMachines()

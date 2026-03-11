@@ -55,9 +55,13 @@
         }
         if(OnDeleteMachine.HasDelegate) {
             await OnDeleteMachine.InvokeAsync(Machine);
-            model.IsConfirmed = false;
-            Machine = null;
         }
+        model.IsConfirmed = false;
         await JS.InvokeVoidAsync("hideModal", "deleteMachineModal");
+    }
+
+    protected override void OnParametersSet()
+    {
+        model = new Confirmation();
     }
 }

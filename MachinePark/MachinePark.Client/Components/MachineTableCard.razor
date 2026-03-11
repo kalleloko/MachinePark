@@ -1,7 +1,9 @@
 @inject IJSRuntime JS
 
+
 <AddMachineForm OnAddMachine="HandleAddMachine" />
 <DeleteMachineForm OnDeleteMachine="HandleDeleteMachine" Machine="SelectedMachine"/>
+<UploadMachineDataForm OnUpload="HandleUploadData" Machine="SelectedMachine" />
 
 <div class="card shadow-sm">
     <div class="card-header d-flex">
@@ -11,13 +13,12 @@
 
     <div class="card-body">
 
-        <table class="table">
+        <table class="table table-dashboard">
             <thead>
                 <tr>
                     <th style="width: 55%">Name</th>
                     <th style="width: 35%">Status</th>
-                    <th style="width: 25px"></th>
-                    <th style="width: 25px"></th>
+                    <th style=""></th>
                 </tr>
             </thead>
 
@@ -36,15 +37,22 @@
                                 <small class="text-muted text-sm">@machine.LastUpdated</small>
                             </div>
                         </td>
-                        <td>
-                            <button class="btn btn-sm @ToggleButtonClass(machine)" title="@ToggleButtonText(machine)" @onclick="@(() => Toggle(machine))">
-                                <i class="bi bi-@ToggleButtonIcon(machine)"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-danger" title="Delete machine" @onclick="() => OpenDeleteMachineModal(machine)">
-                                <i class="bi bi-trash-fill"></i>
-                            </button>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+
+                                <button class="btn" title="@ToggleButtonText(machine)" @onclick="@(() => Toggle(machine))">
+                                    <i class="bi bi-@ToggleButtonIcon(machine)"></i>
+                                </button>
+
+                                <button class="btn" title="Send data" @onclick="@(() => OpenUploadMachineDataModal(machine))">
+                                    <i class="bi bi-upload"></i>
+                                </button>
+
+                                <button class="btn" title="Delete machine" @onclick="@(() => OpenDeleteMachineModal(machine))">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
                         </td>
                     </tr>
                 }
@@ -64,6 +72,9 @@
 
     [Parameter]
     public EventCallback<AddMachine> OnAddMachine { get; set; }
+    
+    [Parameter]
+    public EventCallback<UploadMachineData> OnUploadMachineData { get; set; }
 
     [Parameter]
     public EventCallback<Machine> OnDeleteMachine { get; set; }
@@ -78,12 +89,12 @@
 
     private string ToggleButtonIcon(Machine machine)
     {
-        return machine.IsOnline ? "slash-circle-fill" : "play-fill";
+        return machine.IsOnline ? "stop-fill" : "play-fill";
     }
 
-    private string ToggleButtonClass(Machine machine)
+    private string ToggleButtonColor(Machine machine)
     {
-        return machine.IsOnline ? "btn-outline-danger" : "btn-outline-success";
+        return machine.IsOnline ? "danger" : "success";
     }
 
     private async Task Toggle(Machine machine)
@@ -104,10 +115,23 @@
         await JS.InvokeVoidAsync("showModal", "deleteMachineModal");
     }
 
+    private async Task OpenUploadMachineDataModal(Machine machine)
+    {
+        SelectedMachine = machine;
+        await JS.InvokeVoidAsync("showModal", "uploadMachineDataModal");
+    }
+
     private async Task HandleAddMachine(AddMachine addMachineModel)
     {
         if (OnAddMachine.HasDelegate) {
             await OnAddMachine.InvokeAsync(addMachineModel);
+        }
+    }
+    private async Task HandleUploadData(UploadMachineData machineData)
+    {
+        SelectedMachine = null;
+        if (OnUploadMachineData.HasDelegate) {
+            await OnUploadMachineData.InvokeAsync(machineData);
         }
     }
 

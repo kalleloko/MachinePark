@@ -3,7 +3,7 @@
 <div class="modal fade" id="addMachineModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <EditForm Model="model" OnInvalidSubmit="AddMachine">
+            <EditForm Model="model" OnValidSubmit="AddMachine">
 
                 <div class="modal-header">
                     <h5 class="modal-title">Add machine</h5>
@@ -39,7 +39,7 @@
 </div>
 
 @code {
-   
+
     [Parameter]
     public EventCallback<AddMachine> OnAddMachine { get; set; }
 
@@ -51,6 +51,12 @@
         if (OnAddMachine.HasDelegate) {
             await OnAddMachine.InvokeAsync(model);
         }
+        model = new();
         await JS.InvokeVoidAsync("hideModal", "addMachineModal");
+    }
+
+    protected override void OnParametersSet()
+    {
+        model = new AddMachine();
     }
 }

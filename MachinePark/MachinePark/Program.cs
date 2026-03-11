@@ -83,9 +83,13 @@ public class Program
             return Results.Ok();
         });
 
-        app.MapDelete("/api/machines/{id:guid}/data", (Guid id, MachineRepository repo) =>
+        app.MapPatch("/api/machines/{id:guid}/data", (Guid id, UploadMachineData request, MachineRepository repo) =>
         {
-
+            if (id != request.Id)
+            {
+                return Results.BadRequest("ID in URL does not match ID in request body");
+            }
+            repo.UpdateMachineData(request.Id, request.Data);
             return Results.Ok();
         });
 
