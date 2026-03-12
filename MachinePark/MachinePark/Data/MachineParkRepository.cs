@@ -1,4 +1,5 @@
 ﻿using MachinePark.Shared.Models;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 
 namespace MachinePark.Data;
 
@@ -54,14 +55,15 @@ public class MachineRepository
         machine.LastUpdated = DateTime.Now;
     }
 
-    public void UpdateMachineData(Guid id, string data)
+    public Machine? UpdateMachine(Guid id, JsonPatchDocument<Machine> patch)
     {
         var machine = _machines.FirstOrDefault(m => m.Id == id);
         if (machine is null)
         {
-            return;
+            return null;
         }
-        machine.LastData = data;
+        patch.ApplyTo(machine);
         machine.LastUpdated = DateTime.Now;
+        return machine;
     }
 }

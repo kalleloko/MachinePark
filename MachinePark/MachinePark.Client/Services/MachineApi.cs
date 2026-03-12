@@ -1,4 +1,5 @@
 ﻿
+using MachinePark.Client.Extensions;
 using MachinePark.Shared.Models;
 using System.Net.Http.Json;
 
@@ -22,5 +23,5 @@ public class MachineApi(HttpClient http)
         => http.PostAsJsonAsync("/api/machines", machine);
 
     public Task UpdateMachineDataAsync(UploadMachineData data)
-        => http.PatchAsync($"/api/machines/{data.Id}/data", JsonContent.Create(data));
+        => http.PatchReplaceAsync($"/api/machines/{data.Id}", "LastData", data.Data);
 }
