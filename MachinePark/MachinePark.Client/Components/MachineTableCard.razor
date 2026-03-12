@@ -16,6 +16,7 @@
         <table class="table table-dashboard">
             <thead>
                 <tr>
+                    <th style="15px"></th>
                     <th style="width: 55%">Name</th>
                     <th style="width: 35%">Status</th>
                     <th style=""></th>
@@ -25,6 +26,9 @@
             <tbody>
                 @foreach(var machine in Machines) {
                     <tr>
+                        <td>
+                            <i class="bi bi-circle-fill text-@OnlineStatusColor(machine)"></i>
+                        </td>
                         <td>
                             @machine.Name
                             <div>
@@ -92,9 +96,9 @@
         return machine.IsOnline ? "stop-fill" : "play-fill";
     }
 
-    private string ToggleButtonColor(Machine machine)
+    private string OnlineStatusColor(Machine machine)
     {
-        return machine.IsOnline ? "danger" : "success";
+        return machine.IsOnline ? "success" : "danger";
     }
 
     private async Task Toggle(Machine machine)
