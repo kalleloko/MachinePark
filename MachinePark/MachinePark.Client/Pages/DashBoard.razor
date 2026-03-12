@@ -1,8 +1,11 @@
 ﻿@page "/"
 @* @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false)) *@
+
 @using MachinePark.Client.Components
 @using MachinePark.Client.Services
 @using MachinePark.State
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
 @inject PersistentComponentState ApplicationState
 
 <PageTitle>MachinePark Dashboard</PageTitle>
@@ -39,19 +42,47 @@
     [PersistentState]
     public List<Machine>? Machines { get; set; }
 
-    protected async override Task OnInitializedAsync()
+    private HubConnection? _hubConnection;
+
+
+    // protected async override Task OnInitializedAsync()
+    // {
+    //     if (Machines is null)
+    //     {
+    //         await FetchMachines();
+    //     }
+    //     UpdateCount();
+    // }
+
+    protected override async Task OnInitializedAsync()
     {
-        if (Machines is null)
+        await LoadMachines();
+
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/machinehub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hubConnection.On("MachinesChanged", async () =>
         {
-            await FetchMachines();
-        }
+            await LoadMachines();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
+    private async Task LoadMachines()
+    {
+        Machines = await Api.GetMachinesAsync();
         UpdateCount();
     }
+
 
     private async Task ToggleOnlineState(Machine machine)
     {
         await (machine.IsOnline ? Api.StopMachineAsync(machine.Id) : Api.StartMachineAsync(machine.Id));
-        await FetchMachines();
+        // await FetchMachines();
     }
 
     private async Task HandleAddMachine(AddMachine machine)
@@ -59,23 +90,22 @@
         Machine newMachine = new() {
                 Name = machine.Name,
                 IsOnline = machine.IsOnline,
-                LastUpdated = DateTime.Now,
-                LastData = machine.IsOnline ? "Machine created and running" : "Machine created"
+                LastUpdated = DateTime.Now
             };
         await Api.AddMachineAsync(newMachine);
-        await FetchMachines();
+        // await FetchMachines();
     }
 
     private async Task HandleDeleteMachine(Machine machine)
     {
         await Api.RemoveMachineAsync(machine.Id);
-        await FetchMachines();
+        // await FetchMachines();
     }
 
     private async Task HandleUploadData(UploadMachineData machineData)
     {
         await Api.UpdateMachineDataAsync(machineData);
-        await FetchMachines();
+        // await FetchMachines();
     }
 
     private async Task FetchMachines()
@@ -85,4 +115,13 @@
     }
 
     private void UpdateCount() => State.SetCount(Machines);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+
 }

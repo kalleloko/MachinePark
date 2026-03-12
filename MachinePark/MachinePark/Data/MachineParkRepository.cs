@@ -7,14 +7,19 @@ public class MachineRepository
 {
     private readonly List<Machine> _machines =
     [
-        new() { Name = "Thermometer A", LastData = "7°", IsOnline = true, LastUpdated = DateTime.Now.Add(new System.TimeSpan(-2, 0, 0, 0)) },
-        new() { Name = "Humidity", LastData = "45%", IsOnline = false, LastUpdated = DateTime.Now.Add(new System.TimeSpan(-1, 2, -14, 22)) },
-        new() { Name = "Thermometer B", LastData = "22°", IsOnline = false, LastUpdated = DateTime.Now.Add(new System.TimeSpan(-2, -4, 0, 42)) }
+        new() { Name = "Thermometer A", LastData = 7, Type = MachineType.Thermometer, IsOnline = true, LastUpdated = DateTime.Now.Add(new System.TimeSpan(-2, 0, 0, 0)) },
+        new() { Name = "Humidity", LastData = 45, Type = MachineType.Hygrometer, IsOnline = false, LastUpdated = DateTime.Now.Add(new System.TimeSpan(-1, 2, -14, 22)) },
+        new() { Name = "Thermometer B", LastData = 22, Type = MachineType.Thermometer, IsOnline = false, LastUpdated = DateTime.Now.Add(new System.TimeSpan(-2, -4, 0, 42)) }
     ];
 
     public List<Machine> GetMachines()
     {
         return _machines;
+    }
+
+    public Machine? GetMachine(Guid id)
+    {
+        return _machines.FirstOrDefault(m => m.Id == id);
     }
 
     public void AddMachine(Machine machine)
@@ -39,7 +44,6 @@ public class MachineRepository
             return;
         }
         machine.IsOnline = true;
-        machine.LastData = "Started";
         machine.LastUpdated = DateTime.Now;
     }
 
@@ -51,7 +55,6 @@ public class MachineRepository
             return;
         }
         machine.IsOnline = false;
-        machine.LastData = "Stopped";
         machine.LastUpdated = DateTime.Now;
     }
 

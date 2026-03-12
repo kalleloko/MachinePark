@@ -1,6 +1,8 @@
 using MachinePark.Client.Services;
 using MachinePark.Components;
 using MachinePark.Data;
+using MachinePark.Hubs;
+using MachinePark.Services;
 using MachinePark.Shared.Models;
 using MachinePark.State;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
@@ -20,6 +22,10 @@ public class Program
             .AddInteractiveWebAssemblyComponents();
 
         builder.Services.AddSingleton<MachineRepository>();
+        builder.Services.AddSingleton<MachineService>();
+        builder.Services.AddSignalR();
+        builder.Services.AddHostedService<MachineSimulatorService>();
+
         builder.Services.AddSingleton<MachineState>();
         builder.Services.AddHttpClient<MachineApi>(client =>
         {
@@ -30,6 +36,9 @@ public class Program
 
 
         var app = builder.Build();
+
+
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -55,39 +64,41 @@ public class Program
 
 
 
+        app.MapHub<MachineHub>("/machinehub");
 
-        app.MapGet("/api/machines", (MachineRepository repo) =>
+
+        app.MapGet("/api/machines", (MachineService ms) =>
         {
-            return repo.GetMachines();
+            return ms.GetMachines();
         });
 
-        app.MapPost("/api/machines", (Machine machine, MachineRepository repo) =>
+        app.MapPost("/api/machines", async (Machine machine, MachineService ms) =>
         {
-            repo.AddMachine(machine);
+            await ms.AddMachine(machine);
             return Results.Ok();
         });
 
-        app.MapPost("/api/machines/{id:guid}/start", (Guid id, MachineRepository repo) =>
+        app.MapPost("/api/machines/{id:guid}/start", async (Guid id, MachineService ms) =>
         {
-            repo.StartMachine(id);
+            await ms.StartMachine(id);
             return Results.Ok();
         });
 
-        app.MapPost("/api/machines/{id:guid}/stop", (Guid id, MachineRepository repo) =>
+        app.MapPost("/api/machines/{id:guid}/stop", async (Guid id, MachineService ms) =>
         {
-            repo.StopMachine(id);
+            await ms.StopMachine(id);
             return Results.Ok();
         });
 
-        app.MapDelete("/api/machines/{id:guid}", (Guid id, MachineRepository repo) =>
+        app.MapDelete("/api/machines/{id:guid}", async (Guid id, MachineService ms) =>
         {
-            repo.RemoveMachine(id);
+            await ms.RemoveMachine(id);
             return Results.Ok();
         });
 
-        app.MapPatch("/api/machines/{id:guid}", (Guid id, [FromBody] JsonPatchDocument<Machine> patch, MachineRepository repo) =>
+        app.MapPatch("/api/machines/{id:guid}", async (Guid id, [FromBody] JsonPatchDocument<Machine> patch, MachineService ms) =>
         {
-            var response = repo.UpdateMachine(id, patch);
+            var response = await ms.UpdateMachine(id, patch);
             return Results.Ok(response);
         });
 

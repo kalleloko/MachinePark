@@ -14,12 +14,15 @@
                 <div class="modal-body">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
-                    <div class="mb-3">
-                        <label for="new-machine-name" class="form-label">Data</label>
-                        <InputText id="new-machine-name"
-                                   class="form-control"
+                    <div class="mb-3 input-group">
+                        <label class="input-group-text" for="machine-data">
+                            Value
+                        </label>
+                        <InputNumber id="new-machine-data"
+                                     class="form-control text-end"
                                    @bind-Value="model.Data"
-                                   placeholder="Enter new data..." />
+                                   step="0.1"/>
+                        <span class="input-group-text" inputmode="decimal">@Machine?.Unit</span>
                     </div>
                 </div>  
 
@@ -42,23 +45,43 @@
 
     private UploadMachineData model = new();
 
-    private async Task UploadData()
+    private Guid? _loadedMachineId;
+
+
+    protected override void OnParametersSet()
     {
         if (Machine is null)
         {
             return;
         }
+
+        if (_loadedMachineId == Machine.Id)
+        {
+            return;
+        }
+
+        _loadedMachineId = Machine.Id;
+
+        model = new UploadMachineData
+        {
+            Id = Machine.Id,
+            Data = Math.Round(Machine.LastData, 1)
+        };
+    }
+
+    private async Task UploadData()
+    {
+        Console.WriteLine($"Uploading data {model.Data} to machine {model.Id}");
+        if (Machine is null)
+        {
+            return;
+        }
+        Console.WriteLine("macine exists");
         if(OnUpload.HasDelegate) {
             model.Id = Machine.Id;
             await OnUpload.InvokeAsync(model);
         }
-        model = new UploadMachineData();
         await JS.InvokeVoidAsync("hideModal", "uploadMachineDataModal");
-    }
-
-    protected override void OnParametersSet()
-    {
-        model = new UploadMachineData();
     }
 
 }

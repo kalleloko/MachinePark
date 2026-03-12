@@ -12,5 +12,7 @@ public class AddMachine
 
     [MaxLength(15, ErrorMessage = "Data can’t be longer than 15 characters.")]
     public string LastData { get; set; } = string.Empty;
+
+    public MachineType Type { get; set; } = MachineType.Thermometer;
     public DateTime LastUpdated { get; set; } = DateTime.Now;
 }

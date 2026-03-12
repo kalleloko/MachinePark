@@ -20,6 +20,17 @@
                                    @bind-Value="model.Name"
                                    placeholder="Machine name" />
                     </div>
+                    <div class="mb-3">
+                        <InputSelect id="new-machine-type"
+                                     class="form-select"
+                                     @bind-Value="model.Type">
+                            <option value="">Select machine type...</option>
+                            @foreach (var type in Enum.GetValues<MachineType>())
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </InputSelect>
+                    </div>
                     <div class="form-check mb-3">
                         <InputCheckbox id="new-machine-online-state"
                                        class="form-check-input"
@@ -51,7 +62,6 @@
         if (OnAddMachine.HasDelegate) {
             await OnAddMachine.InvokeAsync(model);
         }
-        model = new();
         await JS.InvokeVoidAsync("hideModal", "addMachineModal");
     }
 
