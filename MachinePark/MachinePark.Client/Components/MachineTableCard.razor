@@ -38,7 +38,7 @@
                         <td>
                             @(machine.IsOnline ? "Running" : "Offline")
                             <div>
-                                <small class="text-muted text-sm">@machine.LastUpdated</small>
+                                <small class="text-muted text-sm">@machine.LastUpdated.ToString("yyyy-MM-dd HH:mm:ss")</small>
                             </div>
                         </td>
                         <td class="text-end">

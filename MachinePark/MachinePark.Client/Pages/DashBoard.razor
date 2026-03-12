@@ -3,6 +3,7 @@
 @using MachinePark.Client.Components
 @using MachinePark.Client.Services
 @using MachinePark.State
+@inject PersistentComponentState ApplicationState
 
 <PageTitle>MachinePark Dashboard</PageTitle>
 
@@ -19,7 +20,10 @@
 
         <!-- Right card (8 columns) -->
         <div class="col-md-8">
-            <MachineTableCard Machines="_machines" OnToggleOnlineState="ToggleOnlineState" OnAddMachine="HandleAddMachine" OnDeleteMachine="HandleDeleteMachine" OnUploadMachineData="HandleUploadData" />
+            @if(Machines is not null)
+            {
+                <MachineTableCard Machines="Machines" OnToggleOnlineState="ToggleOnlineState" OnAddMachine="HandleAddMachine" OnDeleteMachine="HandleDeleteMachine" OnUploadMachineData="HandleUploadData" />
+            }
         </div>
     </div>
 
@@ -32,11 +36,16 @@
     [Inject]
     private MachineState State { get; set; } = null!;
 
-    private List<Machine> _machines = [];
+    [PersistentState]
+    public List<Machine>? Machines { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        await FetchMachines();
+        if (Machines is null)
+        {
+            await FetchMachines();
+        }
+        UpdateCount();
     }
 
     private async Task ToggleOnlineState(Machine machine)
@@ -71,9 +80,9 @@
 
     private async Task FetchMachines()
     {
-        _machines = await Api.GetMachinesAsync();
+        Machines = await Api.GetMachinesAsync();
         UpdateCount();
     }
 
-    private void UpdateCount() => State.SetCount(_machines);
+    private void UpdateCount() => State.SetCount(Machines);
 }

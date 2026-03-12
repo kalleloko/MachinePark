@@ -10,10 +10,10 @@ public class MachineState
 
     public event Action? OnChange;
 
-    public void SetCount(IReadOnlyList<Machine> machines)
+    public void SetCount(IReadOnlyList<Machine>? machines)
     {
-        CountTotal = machines.Count;
-        CountOnline = machines.Count(m => m.IsOnline);
+        CountTotal = machines?.Count ?? 0;
+        CountOnline = machines?.Count(m => m.IsOnline) ?? 0;
         CountOffline = CountTotal - CountOnline;
         NotifyStateChanged();
     }
