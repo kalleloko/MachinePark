@@ -13,23 +13,28 @@
                 <div class="modal-body">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
-                    <div class="mb-3">
-                        <label for="new-machine-name" class="form-label">Machine name</label>
-                        <InputText id="new-machine-name"
-                                   class="form-control"
-                                   @bind-Value="model.Name"
-                                   placeholder="Machine name" />
+                    <div class="row mb-3">
+                        <label for="new-machine-type" class="col-sm-3 col-form-label">Type</label>
+                        <div class="col-sm-9">
+                            <InputSelect id="new-machine-type"
+                                         class="form-select"
+                                         @bind-Value="model.Type">
+                                <option value="">Select machine type...</option>
+                                @foreach (var type in Enum.GetValues<MachineType>())
+                                {
+                                    <option value="@type">@type</option>
+                                }
+                            </InputSelect>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <InputSelect id="new-machine-type"
-                                     class="form-select"
-                                     @bind-Value="model.Type">
-                            <option value="">Select machine type...</option>
-                            @foreach (var type in Enum.GetValues<MachineType>())
-                            {
-                                <option value="@type">@type</option>
-                            }
-                        </InputSelect>
+                    <div class="row mb-3">
+                        <label for="new-machine-name" class="col-sm-3 col-form-label">Name</label>
+                        <div class="col-sm-9">
+                            <InputText id="new-machine-name"
+                                       class="form-control"
+                                       @bind-Value="model.Name"
+                                       placeholder="Enter name..." />
+                        </div>
                     </div>
                     <div class="form-check mb-3">
                         <InputCheckbox id="new-machine-online-state"
