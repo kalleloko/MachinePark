@@ -25,14 +25,14 @@
 
             <tbody>
                 @foreach(var machine in Machines) {
-                    <tr>
+                    <tr class="@OnlineStatusRowClass(machine)" @key="machine.Id">
                         <td>
                             <i class="bi bi-circle-fill text-@OnlineStatusColor(machine)"></i>
                         </td>
                         <td>
                             @machine.Name
                             <div>
-                                <small class="text-muted text-sm">@machine.DisplayValue</small>
+                                <small class="text-muted text-sm">@DisplayData(machine)</small>
                             </div>
                         </td>
                         <td>
@@ -76,7 +76,7 @@
 
     [Parameter]
     public EventCallback<AddMachine> OnAddMachine { get; set; }
-    
+
     [Parameter]
     public EventCallback<UploadMachineData> OnUploadMachineData { get; set; }
 
@@ -99,6 +99,18 @@
     private string OnlineStatusColor(Machine machine)
     {
         return machine.IsOnline ? "success" : "danger";
+    }
+
+    private string OnlineStatusRowClass(Machine machine)
+    {
+        return machine.IsOnline ? "" : "inactive";
+    }
+
+    private string DisplayData(Machine machine)
+    {
+        return machine.IsOnline
+            ? machine.DisplayValue
+            : $"Last data: {machine.DisplayValue} ({TimeAgo(machine.LastUpdated)})";
     }
 
     private async Task Toggle(Machine machine)
@@ -145,5 +157,31 @@
         if (OnDeleteMachine.HasDelegate) {
             await OnDeleteMachine.InvokeAsync(machine);
         }
+    }
+
+    public static string TimeAgo(DateTime dateTime)
+    {
+        var span = DateTime.Now - dateTime;
+
+        if (span.TotalSeconds < 60)
+            return $"{(int)span.TotalSeconds} seconds ago";
+
+        if (span.TotalMinutes < 60)
+        {
+            int m = (int)span.TotalMinutes;
+            return $"{m} minute{(m > 1 ? "s" : "")} ago";
+        }
+
+        if (span.TotalHours < 24)
+        {
+            int h = (int)span.TotalHours;
+            int m = span.Minutes;
+            return m > 0 ? $"{h}h {m}m ago" : $"{h}h ago";
+        }
+
+        int d = (int)span.TotalDays;
+        int hours = span.Hours;
+
+        return hours > 0 ? $"{d} day{(d > 1 ? "s" : "")} {hours}h ago" : $"{d} day{(d > 1 ? "s" : "")} sedan";
     }
 }

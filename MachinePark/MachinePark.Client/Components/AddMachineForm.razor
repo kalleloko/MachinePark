@@ -40,8 +40,15 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Machine</button>
+                    @if (string.IsNullOrWhiteSpace(ErrorMessage))
+                    {
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Machine</button>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">@ErrorMessage <a class="btn btn-secondary" data-bs-dismiss="modal">&times; Close</a></div>
+                    }
                 </div>
             </EditForm>
 
@@ -56,13 +63,20 @@
 
     private AddMachine model = new();
 
+    public string? ErrorMessage { get; set; }
+
     private async Task AddMachine()
     {
-        // spara maskin
-        if (OnAddMachine.HasDelegate) {
-            await OnAddMachine.InvokeAsync(model);
+        try {
+            if (OnAddMachine.HasDelegate) {
+                await OnAddMachine.InvokeAsync(model);
+            }
+            await JS.InvokeVoidAsync("hideModal", "addMachineModal");
         }
-        await JS.InvokeVoidAsync("hideModal", "addMachineModal");
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Kunde inte spara maskinen: {ex.Message}";
+        }
     }
 
     protected override void OnParametersSet()

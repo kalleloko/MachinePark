@@ -25,3 +25,6 @@
 .icon-delete:hover {
     color: var(--bs-danger);
 }
+tr.inactive {
+    opacity: 0.6;
+}

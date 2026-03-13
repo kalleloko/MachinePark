@@ -90,7 +90,8 @@
         Machine newMachine = new() {
                 Name = machine.Name,
                 IsOnline = machine.IsOnline,
-                LastUpdated = DateTime.Now
+                LastUpdated = DateTime.Now,
+                Type = machine.Type
             };
         await Api.AddMachineAsync(newMachine);
         // await FetchMachines();

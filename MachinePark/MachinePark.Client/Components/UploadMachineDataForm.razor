@@ -27,8 +27,15 @@
                 </div>  
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Send</button>
+                    @if (string.IsNullOrWhiteSpace(ErrorMessage))
+                    {
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">@ErrorMessage <a class="btn btn-secondary" data-bs-dismiss="modal">&times; Close</a></div>
+                    }
                 </div>
 
             </EditForm>
@@ -46,6 +53,8 @@
     private UploadMachineData model = new();
 
     private Guid? _loadedMachineId;
+    
+    public string? ErrorMessage { get; set; }
 
 
     protected override void OnParametersSet()
@@ -71,17 +80,21 @@
 
     private async Task UploadData()
     {
-        Console.WriteLine($"Uploading data {model.Data} to machine {model.Id}");
         if (Machine is null)
         {
             return;
         }
-        Console.WriteLine("macine exists");
-        if(OnUpload.HasDelegate) {
-            model.Id = Machine.Id;
-            await OnUpload.InvokeAsync(model);
+        try {
+            if(OnUpload.HasDelegate) {
+                model.Id = Machine.Id;
+                await OnUpload.InvokeAsync(model);
+            }
+            await JS.InvokeVoidAsync("hideModal", "uploadMachineDataModal");
         }
-        await JS.InvokeVoidAsync("hideModal", "uploadMachineDataModal");
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Kunde inte uppdatera maskinen: {ex.Message}";
+        }
     }
 
 }

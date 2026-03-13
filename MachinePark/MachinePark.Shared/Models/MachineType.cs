@@ -8,12 +8,12 @@ public enum MachineType
     [Unit("%")]
     Hygrometer,
 
-    [Unit("hPa")]
+    [Unit(" hPa")]
     Barometer,
 
-    [Unit("rpm")]
+    [Unit(" rpm")]
     Speedometer,
 
-    [Unit("bar")]
+    [Unit(" bar")]
     PressureSensor
 }

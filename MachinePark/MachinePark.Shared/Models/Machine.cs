@@ -12,7 +12,7 @@ public class Machine
     public double LastData { get; set; }
     public DateTime LastUpdated { get; set; }
     public string Unit => Type.GetUnit();
-    public string DisplayValue => LastData.ToString("F1") + " " + Unit;
+    public string DisplayValue => LastData.ToString("F1") + Unit;
 
     public void UpdateValue(Random random)
     {
