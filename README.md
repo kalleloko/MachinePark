@@ -45,12 +45,13 @@ This ensures that machine status and data changes are immediately reflected in t
 
 The solution is divided into three projects:
 
+```
 MachinePark
 │
 ├── MachinePark # Server (API, business logic, SignalR hub)
 ├── MachinePark.Client # Blazor WebAssembly frontend
 └── MachinePark.Shared # Shared models used by both client and server
-
+```
 
 The **Shared** project contains data models used by both the client and the server to avoid duplication and keep the API contract consistent.
 
