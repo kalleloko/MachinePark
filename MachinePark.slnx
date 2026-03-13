@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path="README.md" />
   </Folder>
   <Project Path="MachinePark/MachinePark.Client/MachinePark.Client.csproj" />
   <Project Path="MachinePark/MachinePark.Shared/MachinePark.Shared.csproj" />
